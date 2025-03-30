@@ -12,7 +12,7 @@ namespace Software.Data
 
         public DatabaseHelper()
         {
-            //    CreateDatabaseAndTables();
+            CreateDatabaseAndTables();
             //    InsertDummyData();
         }
 

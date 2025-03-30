@@ -58,10 +58,7 @@ namespace Software
             MainFrame.Navigate(new ExpiryDetailsPage());
         }
 
-        private void btnProfit_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new ProfitPage());
-        }
+        
 
         private void btnStockDetail_Click(object sender, RoutedEventArgs e)
         {

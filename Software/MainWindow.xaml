@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Software"
         mc:Ignorable="d"
-        Title="Customer Management System" Height="600" Width="1100">
+        Title="Customer Management System" Height="600" Width="1100" 
+        Icon="/Resources/logo.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180" />
@@ -63,12 +64,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button x:Name="btnProfit" Click="btnProfit_Click" Style="{StaticResource SidebarButtonStyle}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE753;" Foreground="White" Margin="0,0,10,0"/>
-                        <TextBlock Text="Profit" Foreground="White"/>
-                    </StackPanel>
-                </Button>
+                
 
                 <Button x:Name="btnStockDetail" Click="btnStockDetail_Click" Style="{StaticResource SidebarButtonStyle}">
                     <StackPanel Orientation="Horizontal">
