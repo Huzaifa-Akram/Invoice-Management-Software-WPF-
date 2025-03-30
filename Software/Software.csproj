@@ -65,6 +65,16 @@
   <PropertyGroup>
     <SignManifests>true</SignManifests>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'x64|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.2.1.66\lib\net461\Dapper.dll</HintPath>
@@ -224,7 +234,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Software_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -242,18 +251,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\add.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\logo2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\logo3.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\logo4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\logo4.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\logo.ico" />

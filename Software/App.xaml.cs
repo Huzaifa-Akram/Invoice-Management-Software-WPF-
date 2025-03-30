@@ -2,6 +2,7 @@
 using System.Windows;
 using Microsoft.Win32;
 using Software.Data;
+using System.Net.Http;
 
 namespace Software
 {
@@ -14,12 +15,11 @@ namespace Software
         {
             base.OnStartup(e);
 
-            //DatabaseHelper dbHelper = new DatabaseHelper();
-
+            // Ensure compatibility with .NET 6.0 or later
+            // DatabaseHelper dbHelper = new DatabaseHelper();
         }
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            //string storedLicenseKey = null;
             string storedLicenseKey = (string)Registry.GetValue(
                 @"HKEY_CURRENT_USER\Software\SoftwareName", "StoredLicenseKey", null);
 

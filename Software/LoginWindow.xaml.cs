@@ -8,6 +8,7 @@ using System.Windows;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 
 namespace Software
 {
@@ -17,18 +18,15 @@ namespace Software
         private const string LicenseSentRegistryKey = @"HKEY_CURRENT_USER\Software\SoftwareName";
         private const string LicenseSentRegistryValue = "LicenseSent";
 
-
         public LoginWindow()
         {
             InitializeComponent();
             Loaded += (s, e) => txtLicenseKey.Focus();
             Debug.WriteLine("LoginWindow initialized.");
 
-            // Ensure the directory exists
             Directory.CreateDirectory(Path.GetDirectoryName(LicenseFilePath));
             Debug.WriteLine("License directory ensured.");
 
-            // Check if license key exists, if not generate and send it
             if (!File.Exists(LicenseFilePath))
             {
                 Debug.WriteLine("License key file not found. Generating new license key.");
@@ -36,8 +34,6 @@ namespace Software
                 File.WriteAllText(LicenseFilePath, licenseKey);
                 Debug.WriteLine($"License key generated and saved: {licenseKey}");
 
-                // Check if the license key has already been sent
-                //object licenseSent = null;
                 object licenseSent = Registry.GetValue(LicenseSentRegistryKey, LicenseSentRegistryValue, null);
                 if (licenseSent == null)
                 {
@@ -56,8 +52,6 @@ namespace Software
                 Debug.WriteLine("License key file found.");
             }
 
-            // Check if the license key is already stored in the registry
-            //string storedLicenseKey = null;
             string storedLicenseKey = (string)Registry.GetValue(LicenseSentRegistryKey, "StoredLicenseKey", null);
             if (storedLicenseKey != null && storedLicenseKey == File.ReadAllText(LicenseFilePath))
             {
@@ -78,17 +72,7 @@ namespace Software
 
             if (enteredLicenseKey == storedLicenseKey)
             {
-                Debug.WriteLine("License key is valid. Storing in registry and opening main window.");
-                Registry.SetValue(LicenseSentRegistryKey, "StoredLicenseKey", enteredLicenseKey);
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
-                Close();
-            }
-            else
-            {
-                Debug.WriteLine("Invalid license key entered.");
-                txtError.Text = "Invalid license key!";
-                txtError.Visibility = Visibility.Visible;
+                // ...existing code...
             }
         }
 
@@ -136,8 +120,6 @@ namespace Software
             return string.Join("-", Enumerable.Range(0, key.Length / 5)
                 .Select(i => key.Substring(i * 5, Math.Min(5, key.Length - i * 5))));
         }
-
-
 
         private void SendLicenseKeyToEmail(string licenseKey)
         {

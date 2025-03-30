@@ -1,4 +1,7 @@
 using System;
+// ...existing code...
+using System.Net.Http;
+// ...existing code...
 using System.Data.SQLite;
 using System.Windows;
 using System.Windows.Controls;
