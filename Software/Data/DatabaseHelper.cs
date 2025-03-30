@@ -278,5 +278,46 @@ namespace Software.Data
                 }
             }
         }
+
+        public List<ItemBatch> GetExpiryDetails()
+        {
+            var batches = new List<ItemBatch>();
+
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                string query = @"
+                    SELECT i.Name AS ItemName, i.CompanyName, ib.PurchaseRate, ib.Quantity, ib.ExpiryDate,
+                           CASE 
+                               WHEN ib.ExpiryDate < date('now') THEN 'Expired'
+                               WHEN ib.ExpiryDate < date('now', '+30 days') THEN 'Expiring Soon'
+                               ELSE ''
+                           END AS Alert
+                    FROM ItemBatches ib
+                    JOIN Items i ON ib.ItemId = i.Id
+                    ORDER BY ib.ExpiryDate ASC";
+
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            batches.Add(new ItemBatch
+                            {
+                                ItemName = reader["ItemName"].ToString(),
+                                CompanyName = reader["CompanyName"].ToString(),
+                                PurchaseRate = Convert.ToDecimal(reader["PurchaseRate"]),
+                                Quantity = Convert.ToInt32(reader["Quantity"]),
+                                ExpiryDate = Convert.ToDateTime(reader["ExpiryDate"]),
+                                Alert = reader["Alert"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return batches;
+        }
     }
 }
