@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 
@@ -11,8 +12,8 @@ namespace Software.Data
 
         public DatabaseHelper()
         {
-            //CreateDatabaseAndTables();
-            //InsertDummyData();
+            //    CreateDatabaseAndTables();
+            //    InsertDummyData();
         }
 
         private void CreateDatabaseAndTables()
@@ -204,6 +205,78 @@ namespace Software.Data
         public SQLiteConnection GetConnection()
         {
             return new SQLiteConnection(connectionString);
+        }
+
+        // ...existing code...
+        public void ReturnInvoice(string invoiceNumber)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                var transaction = connection.BeginTransaction();
+
+                try
+                {
+                    var command = connection.CreateCommand();
+                    command.Transaction = transaction;
+
+                    // Get the items in the invoice
+                    command.CommandText = @"
+                        SELECT ItemId, Quantity
+                        FROM InvoiceItems
+                        WHERE InvoiceNumber = @InvoiceNumber";
+                    command.Parameters.AddWithValue("@InvoiceNumber", invoiceNumber);
+
+                    var reader = command.ExecuteReader();
+                    var items = new List<InvoiceItem>();
+
+                    while (reader.Read())
+                    {
+                        items.Add(new InvoiceItem
+                        {
+                            ItemId = Convert.ToInt32(reader["ItemId"]),
+                            Quantity = Convert.ToInt32(reader["Quantity"])
+                        });
+                    }
+                    reader.Close();
+
+                    // Update the item quantities in the database
+                    foreach (var item in items)
+                    {
+                        command.CommandText = @"
+                            UPDATE Items
+                            SET TotalQuantity = TotalQuantity + @Quantity
+                            WHERE Id = @ItemId";
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@Quantity", item.Quantity);
+                        command.Parameters.AddWithValue("@ItemId", item.ItemId);
+                        command.ExecuteNonQuery();
+                    }
+
+                    // Delete the invoice items
+                    command.CommandText = @"
+                        DELETE FROM InvoiceItems
+                        WHERE InvoiceNumber = @InvoiceNumber";
+                    command.Parameters.Clear();
+                    command.Parameters.AddWithValue("@InvoiceNumber", invoiceNumber);
+                    command.ExecuteNonQuery();
+
+                    // Delete the invoice
+                    command.CommandText = @"
+                        DELETE FROM Invoices
+                        WHERE InvoiceNumber = @InvoiceNumber";
+                    command.Parameters.Clear();
+                    command.Parameters.AddWithValue("@InvoiceNumber", invoiceNumber);
+                    command.ExecuteNonQuery();
+
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
         }
     }
 }

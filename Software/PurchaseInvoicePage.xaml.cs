@@ -67,7 +67,7 @@ namespace Software
                 using (var command = new SQLiteCommand(query, connection))
                 {
                     var result = command.ExecuteScalar();
-                    InvoiceNumberTextBox.Text = $"Invoice no:{invoiceType}{result}";
+                    InvoiceNumberTextBox.Text = $"Invoice no: {invoiceType}{result}";
                 }
             }
         }
@@ -260,7 +260,7 @@ namespace Software
                         VALUES (@InvoiceNumber, @SupplierId, @SupplierName, datetime('now'), 'P');";
 
 
-                        string invoiceNumberText = InvoiceNumberTextBox.Text;
+                        string invoiceNumberText = InvoiceNumberTextBox.Text.Replace("Invoice no: ", "");
 
                         using (var command = new SQLiteCommand(insertInvoiceQuery, connection, transaction))
                         {

@@ -134,7 +134,7 @@ namespace Software
                     // Subtract reserved quantities (items in the current invoice)
                     int reservedQty = GetReservedQuantityExcept(itemId, excludeItem);
                     return dbQuantity - reservedQty;
-                }
+                } 
             }
         }
 
@@ -787,8 +787,8 @@ namespace Software
                             var item = _allItems.FirstOrDefault(i => i.Id == itemId);
                             if (item == null || requestedQuantity > availableQuantity)
                             {
-                                MessageBox.Show($"Cannot save invoice. Item \"{item?.Name}\" has insufficient quantity.",
-                                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                _toastNotification.Show($"Cannot save invoice. Item \"{item?.Name}\" has insufficient quantity.",
+                                    ToastNotification.NotificationType.Error);
                                 transaction.Rollback(); // Rollback the transaction
                                 return; // Return early if there's an error
                             }
@@ -817,7 +817,8 @@ namespace Software
                 INSERT INTO Invoices (InvoiceNumber, CustomerId, InvoiceDate, InvoiceType)
                 VALUES (@InvoiceNumber, @CustomerId, datetime('now'), 'S');"; // 'S' for Sales
 
-                        string invoiceNumberText = InvoiceNumberTextBox.Text;
+                        // Remove the "Invoice no: " prefix before saving
+                        string invoiceNumberText = InvoiceNumberTextBox.Text.Replace("Invoice no: ", "");
 
                         using (var command = new SQLiteCommand(insertInvoiceQuery, connection, transaction))
                         {
@@ -852,10 +853,6 @@ namespace Software
                 SET Quantity = Quantity - @Quantity
                 WHERE Id = @BatchId;";
 
-                        string deleteBatchQuery = @"
-                DELETE FROM ItemBatches
-                WHERE Id = @BatchId AND Quantity <= 0;";
-
                         string updateItemTotalQuery = @"
                 UPDATE Items
                 SET TotalQuantity = TotalQuantity - @Quantity
@@ -869,13 +866,6 @@ namespace Software
                             {
                                 command.Parameters.AddWithValue("@BatchId", deduction.BatchId);
                                 command.Parameters.AddWithValue("@Quantity", deduction.Quantity);
-                                command.ExecuteNonQuery();
-                            }
-
-                            // Delete batch if quantity is zero or less
-                            using (var command = new SQLiteCommand(deleteBatchQuery, connection, transaction))
-                            {
-                                command.Parameters.AddWithValue("@BatchId", deduction.BatchId);
                                 command.ExecuteNonQuery();
                             }
 
@@ -915,8 +905,6 @@ namespace Software
 
                         transaction.Commit();
                         _toastNotification.Show("Sale Invoice saved successfully!", ToastNotification.NotificationType.Success);
-
-
                     }
                     catch (Exception ex)
                     {
@@ -926,6 +914,9 @@ namespace Software
                 }
             }
         }
+
+        
+
         private void ResetForm()
         {
             _invoiceItems.Clear();
